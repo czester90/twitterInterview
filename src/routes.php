@@ -1,12 +1,14 @@
 <?php
 
-use Packages\Error;
 use Packages\Twitter;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use Utils\Converter;
 
 $app->get('/', function (Request $request, Response $response, array $args) {
-    return 'Try​ ​/hello/:name';
+    $response->getBody()->write('Try​ ​/hello/:name');
+
+    return $response;
 });
 
 $app->get('/{name:[A-Za-z]+}', function (Request $request, Response $response, array $args) {
@@ -18,17 +20,30 @@ $app->get('/{name:[A-Za-z]+}', function (Request $request, Response $response, a
 });
 
 $app->get('/histogram/{username}', function (Request $request, Response $response, array $args) use ($settings) {
-    $twitter = new Twitter\TwitterHandler($settings['twitter']);
+    // Connection to Twitter Api
+    $twitter = new Twitter\TwitterService($settings['twitter']);
 
     try {
+        // Verification of the connection
         $twitter->verify();
-
+        // Tweets Collection
         $tweets = $twitter->getTweetsForUsername($args['username']);
-        $json = json_encode($tweets->getTweetsPerDay(), JSON_PRETTY_PRINT);
+        $json = Converter::toJson([
+            'username' => $args['username'],
+            'tweets' => $tweets->getNumberOfTweetsPerDay(),
+            'total' => $tweets->getTotalNumberOfTweets(),
+            'most_active_hour' => $tweets->getMostActiveHour()
+        ]);
     } catch (\Exception $e) {
-        $json = Error\ErrorMessage::json($e);
+        // Generate error message in the event of an error
+        $json = Converter::toJson([
+            'error' => [
+                'code' => $e->getCode(),
+                'message' => $e->getMessage()
+            ]
+        ]);
     }
 
-    return $response->write($json)
-        ->withHeader('Content-Type', 'application/json;charset=utf-8');
+    // Display data in json format
+    return $response->write($json)->withHeader('Content-Type', 'application/json;charset=utf-8');
 });

@@ -4,11 +4,23 @@ namespace Packages\Twitter;
 
 use Abraham\TwitterOAuth\TwitterOAuth;
 use Abraham\TwitterOAuth\TwitterOAuthException;
+use Packages\Twitter\Exceptions\UsernameNotFoundException;
 
-class TwitterHandler
+/**
+ * Service of twitter api requests
+ *
+ * @package Packages\Twitter
+ */
+class TwitterService
 {
+    /** @var TwitterOAuth Connection to twitter api */
     private $connection;
 
+    /**
+     * TwitterService constructor.
+     *
+     * @param string[] $config Twitter credentials
+     */
     public function __construct(array $config)
     {
         $this->connection = new TwitterOAuth(
@@ -20,38 +32,54 @@ class TwitterHandler
     }
 
     /**
-     * @return bool
+     * Gets Twitter api connection
+     *
+     * @return TwitterOAuth
+     */
+    public function getConnection(): TwitterOAuth
+    {
+        return $this->connection;
+    }
+
+    /**
+     * Connection verification status
+     *
+     * @return bool if the verification was successful or not
      * @throws TwitterOAuthException
      */
     public function verify(): bool
     {
-        $accountAuthentication = $this->connection->get("account/verify_credentials");
+        $accountAuthentication = $this->getConnection()->get("account/verify_credentials");
+
+        // Returns error object if verification are failed
         if (isset($accountAuthentication->errors)) {
             throw new TwitterOAuthException(
                 $accountAuthentication->errors[0]->message,
                 $accountAuthentication->errors[0]->code
             );
         }
+
         return true;
     }
 
     /**
-     * Tweets per day 2400 limit
+     * Returns tweets from user timeline
      *
-     * @param string $username
+     * @param string $username Username of twitter user
      *
      * @return TweetsCollection
      * @throws UsernameNotFoundException
      */
-    public function getTweetsForUsername(string $username)
+    public function getTweetsForUsername(string $username): TweetsCollection
     {
-        $tweets = $this->connection->get('statuses/user_timeline', [
+        $tweets = $this->getConnection()->get('statuses/user_timeline', [
             'screen_name' => $username,
             'include_entities' => true,
             'include_rts' => true,
-            'count' => 2400
+            'count' => 2400 // Limit of tweets per day
         ]);
 
+        // Returns error id user doesn't exist
         if (isset($tweets->errors)) {
             throw new UsernameNotFoundException(
                 $tweets->errors[0]->message,

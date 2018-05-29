@@ -1,14 +1,10 @@
 {
-    "name": "slim/slim-skeleton",
-    "description": "A Slim Framework skeleton application for rapid development",
-    "keywords": ["microframework", "rest", "router", "psr7"],
-    "homepage": "http://github.com/slimphp/Slim-Skeleton",
-    "license": "MIT",
+    "name": "czester90/twitterInterview",
+    "description": "Twitter Interview",
     "authors": [
         {
-            "name": "Josh Lockhart",
-            "email": "info@joshlockhart.com",
-            "homepage": "http://www.joshlockhart.com/"
+            "name": "Michał Mrzygłód",
+            "email": "t.czester@wp.pl",
         }
     ],
     "require": {
@@ -24,7 +20,8 @@
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/",
-            "Packages\\": "src/Packages"
+            "Packages\\": "src/Packages",
+            "Utils\\": "src/Utils"
         }
     },
     "config": {
