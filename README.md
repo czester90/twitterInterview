@@ -24,5 +24,5 @@ You should see json data about number tweets in current day
 Go to the folder with the application and follow
 
 ```sh
-$ phpunit
+$ ./vendor/bin/phpunit
 ```
