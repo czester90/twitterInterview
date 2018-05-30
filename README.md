@@ -15,6 +15,12 @@ $ composer install
 $ php -S localhost:8080 -t public index.php
 ```
 
+Update Twitter credentials in
+
+```sh
+$ src/settings.php
+```
+
 Go to for example to page [http://localhost:8080/histogram/cnnbrk](http://localhost:8080/histogram/cnnbrk)
 
 You should see json data about number tweets in current day 
